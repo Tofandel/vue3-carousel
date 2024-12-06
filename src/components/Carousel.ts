@@ -213,7 +213,7 @@ export default defineComponent({
 
     let animationInterval: number
 
-    const setAnimationInterval = (event: AnimationEvent | TransitionEvent) => {
+    const setAnimationInterval = (event: AnimationEvent) => {
       const target = event.target as HTMLElement
       if (target && !transformElements.includes(target)) {
         transformElements.push(target)
@@ -242,14 +242,25 @@ export default defineComponent({
       }
     }
 
+    const mounted = ref(false)
+
+    if (document) {
+      watchEffect(() => {
+        if (mounted.value && !props.ignoreAnimations) {
+          document.addEventListener('animationstart', setAnimationInterval)
+          document.addEventListener('animationend', finishAnimation)
+        } else {
+          document.removeEventListener('animationstart', setAnimationInterval)
+          document.removeEventListener('animationend', finishAnimation)
+        }
+      })
+    }
+
     onMounted((): void => {
       updateBreakpointsConfig()
       initAutoplay()
+      mounted.value = true
 
-      if (document) {
-        document.addEventListener('animationstart', setAnimationInterval)
-        document.addEventListener('animationend', finishAnimation)
-      }
       if (root.value) {
         resizeObserver = new ResizeObserver(handleResize)
         resizeObserver.observe(root.value)
@@ -259,6 +270,7 @@ export default defineComponent({
     })
 
     onBeforeUnmount(() => {
+      mounted.value = false
       // Empty the slides before they unregister for better performance
       slides.splice(0, slides.length)
       indexCbs.splice(0, indexCbs.length)
@@ -279,8 +291,6 @@ export default defineComponent({
 
       if (document) {
         document.removeEventListener('keydown', handleArrowKeys)
-        document.removeEventListener('animationstart', setAnimationInterval)
-        document.removeEventListener('animationend', finishAnimation)
       }
       if (root.value) {
         root.value.removeEventListener('transitionend', updateSlideSize)
@@ -673,6 +683,7 @@ export default defineComponent({
           cloneVNode(vnode, {
             index: -slides.length + toShow + index,
             isClone: true,
+            id: undefined,
             key: `clone-before-${String(vnode.key)}`,
           })
         )
@@ -680,6 +691,7 @@ export default defineComponent({
           cloneVNode(vnode, {
             index: slides.length + index,
             isClone: true,
+            id: undefined,
             key: `clone-after-${String(vnode.key)}`,
           })
         )

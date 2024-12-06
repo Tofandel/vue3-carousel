@@ -6,7 +6,7 @@ import {
   DIR_OPTIONS,
   SNAP_ALIGN_OPTIONS,
 } from '@/partials/defaults'
-import { BreakpointMode, Dir, SnapAlign } from '@/types'
+import { BreakpointMode, CarouselConfig, Dir, SnapAlign } from '@/types'
 
 export const carouselProps = {
   // enable/disable the carousel component
@@ -102,4 +102,8 @@ export const carouselProps = {
     default: DEFAULT_CONFIG.i18n,
     type: Object as PropType<typeof DEFAULT_CONFIG.i18n>,
   },
+  ignoreAnimations: {
+    default: false,
+    type: [Array, Boolean] as PropType<CarouselConfig['ignoreAnimations']>,
+  }
 }
