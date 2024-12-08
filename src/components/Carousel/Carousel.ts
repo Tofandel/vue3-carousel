@@ -16,6 +16,8 @@ import {
   ComponentInternalInstance,
   watchEffect,
   shallowReactive,
+  pushScopeId,
+  popScopeId,
 } from 'vue'
 
 import { ARIA as ARIAComponent } from '@/components/ARIA'
@@ -65,10 +67,11 @@ export const Carousel = defineComponent({
     const slideSize: Ref<number> = ref(0)
     const slidesCount = computed(() => slides.length)
 
+    const i18nTracker = {}
     const fallbackConfig = computed(() => ({
       ...DEFAULT_CONFIG,
       ...props,
-      i18n: { ...DEFAULT_CONFIG.i18n, ...props.i18n },
+      i18n: Object.assign(i18nTracker, DEFAULT_CONFIG.i18n, props.i18n),
       breakpoints: undefined,
     }))
 
@@ -127,18 +130,19 @@ export const Carousel = defineComponent({
     function updateBreakpointsConfig(): void {
       // Determine the width source based on the 'breakpointMode' config
       const widthSource =
-        (config.breakpointMode === 'carousel'
+        (fallbackConfig.value.breakpointMode === 'carousel'
           ? root.value?.getBoundingClientRect().width
-          : window.innerWidth) || 0
+          : typeof window !== "undefined" ? window.innerWidth : 0) || 0
 
       const breakpointsArray = Object.keys(props.breakpoints || {})
         .map((key) => Number(key))
         .sort((a, b) => +b - +a)
 
-      let newConfig = { ...fallbackConfig.value } as CarouselConfig
+      const newConfig: CarouselConfig = { ...fallbackConfig.value } as CarouselConfig
       breakpointsArray.some((breakpoint) => {
         if (widthSource >= breakpoint) {
-          newConfig = { ...newConfig, ...props.breakpoints?.[breakpoint] }
+          Object.assign(newConfig, props.breakpoints![breakpoint]);
+          Object.assign(newConfig.i18n, fallbackConfig.value.i18n, props.breakpoints![breakpoint].i18n)
           return true
         }
         return false
@@ -231,8 +235,11 @@ export const Carousel = defineComponent({
       }
     }
 
+    updateBreakpointsConfig()
     onMounted((): void => {
-      updateBreakpointsConfig()
+      if (fallbackConfig.value.breakpointMode === 'carousel') {
+        updateBreakpointsConfig()
+      }
       initAutoplay()
 
       if (document) {
@@ -669,6 +676,8 @@ export const Carousel = defineComponent({
       const addonsElements = slotAddons?.(data) || []
 
       if (config.wrapAround) {
+        // Ensure scoped css tracks properly
+        pushScopeId(output.length > 0 ? output[0].scopeId : null)
         const toShow = clonedSlidesCount.value
         const slidesBefore = []
         for (let i = -toShow; i < 0; i++) {
@@ -682,12 +691,13 @@ export const Carousel = defineComponent({
         const slidesAfter = []
         for (let i = 0; i < toShow; i++) {
           const props = {
-            index: i + slides.length,
+            index: slides.length > 0 ? i + slides.length : i + 99999,
             isClone: true,
             key: `clone-after-${i}`,
           };
-          slidesAfter.push(slides.length > 0 ? cloneVNode(slides[(i + slides.length) % slides.length].vnode, props) : h(Slide, props))
+          slidesAfter.push(slides.length > 0 ? cloneVNode(slides[i % slides.length].vnode, props) : h(Slide, props))
         }
+        popScopeId()
         output = [...slidesBefore, ...output, ...slidesAfter]
       }
 
