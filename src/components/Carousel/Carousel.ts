@@ -224,8 +224,7 @@ export const Carousel = defineComponent({
 
     const setAnimationInterval = (event: AnimationEvent) => {
       const target = event.target as HTMLElement
-      if (!target?.contains(root.value) || Array.isArray(ignoreAnimations.value) && ignoreAnimations.value.includes(event.animationName)
-        || window.getComputedStyle(target).animationIterationCount === 'infinite') {
+      if (!target?.contains(root.value) || Array.isArray(ignoreAnimations.value) && ignoreAnimations.value.includes(event.animationName)) {
         return;
       }
 
