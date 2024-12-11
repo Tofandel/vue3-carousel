@@ -64,7 +64,7 @@ jobs:
           name: coverage-report
 
       - name: Code Coverage Annotation
-        uses: tofandel/codecoverage@05cda7049c2ad4af7deeb39044aa0c87063e1227
+        uses: tofandel/codecoverage@main
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           COVERAGE_FILE_PATH: "./clover.xml"
