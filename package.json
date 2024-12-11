@@ -1,6 +1,6 @@
 {
-  "name": "vue3-carousel",
-  "version": "0.9.0",
+  "name": "@tofandel/vue3-carousel",
+  "version": "0.9.11",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
