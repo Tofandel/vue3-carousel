@@ -212,11 +212,7 @@ export const Carousel = defineComponent({
 
       // Validate itemsToShow
       if (!isAuto.value) {
-        config.itemsToShow = getNumberInRange({
-          val: Number(config.itemsToShow),
-          max: slidesCount.value,
-          min: 1,
-        })
+        config.itemsToShow = Math.max(Number(config.itemsToShow), 1);
       }
     }
 
