@@ -849,6 +849,7 @@ export const Carousel = defineComponent({
     })
 
     expose<CarouselExposed>({
+      provided,
       data,
       nav,
       next,

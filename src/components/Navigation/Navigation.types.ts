@@ -1,1 +1,5 @@
-export type NavigationProps = Record<never, never> // No props for now
+import { Carousel } from '@/components/Carousel'
+
+export type NavigationProps = {
+  carousel?: InstanceType<typeof Carousel>
+}

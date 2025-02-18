@@ -31,6 +31,7 @@ export type CarouselData = {
 export type CarouselExposed = CarouselMethods & {
   data: Reactive<CarouselData>
   nav: CarouselNav
+  provided: InjectedCarousel
 }
 
 export type CarouselMethods = CarouselNav & {

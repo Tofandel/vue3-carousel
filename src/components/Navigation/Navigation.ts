@@ -1,5 +1,6 @@
-import { computed, defineComponent, h, inject } from 'vue'
+import { computed, defineComponent, h, inject, PropType } from 'vue'
 
+import { InjectedCarousel } from '@/components/Carousel'
 import { injectCarousel, NormalizedDir } from '@/shared'
 
 import { Icon, IconNameValue } from '../Icon'
@@ -9,8 +10,13 @@ import { NavigationProps } from './Navigation.types'
 export const Navigation = defineComponent<NavigationProps>({
   name: 'CarouselNavigation',
   inheritAttrs: false,
+  props: {
+    carousel: {
+      type: Object as PropType<NavigationProps['carousel']>,
+    }
+  },
   setup(props, { slots, attrs }) {
-    const carousel = inject(injectCarousel)
+    const carousel: InjectedCarousel = props.carousel ? props.carousel.injected : inject(injectCarousel)
     if (!carousel) {
       return () => '' // Don't render, let vue warn about the missing provide
     }

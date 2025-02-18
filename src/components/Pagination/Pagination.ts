@@ -1,5 +1,7 @@
-import { computed, defineComponent, h, inject, VNode } from 'vue'
+import { computed, defineComponent, h, inject, PropType, VNode } from 'vue'
 
+import { InjectedCarousel } from '@/components/Carousel'
+import { NavigationProps } from '@/components/Navigation'
 import { injectCarousel } from '@/shared'
 import { getSnapAlignOffset, i18nFormatter, mapNumberToRange } from '@/utils'
 
@@ -14,9 +16,12 @@ export const Pagination = defineComponent<PaginationProps>({
     paginateByItemsToShow: {
       type: Boolean,
     },
+    carousel: {
+      type: Object as PropType<NavigationProps['carousel']>,
+    }
   },
   setup(props) {
-    const carousel = inject(injectCarousel)
+    const carousel: InjectedCarousel = props.carousel ? props.carousel.injected : inject(injectCarousel)
 
     if (!carousel) {
       return () => '' // Don't render, let vue warn about the missing provide
